@@ -1,0 +1,50 @@
+#!/usr/bin/python3
+
+import sys
+from sys import argv
+
+conf = {
+    "helpMsg": """USAGE
+            {} input_file -t translation_file [-o output_file]
+
+        OPTIONS
+            -t translation_file
+                JSON file to use as translation dictionary
+
+            -o output_file
+                Saves post-processed file in the specified file.
+                If not given, outputs to stdout.
+
+        EXAMPLES
+        """.replace("\n        ", "\n").format(argv[0]),
+
+    "oFile": None,
+    "iFile": None,
+    "tFile": None,
+}
+
+if argv.count("-h") > 0:
+    print(conf["helpMsg"])
+    sys.exit(0)
+
+if argv.count("-t") == 0:
+    print(conf["helpMsg"])
+    sys.exit(1)
+
+if argv.count("-o") > 0:
+    idx = argv.index("-o")
+    conf["oFile"] = open(argv[idx+1], "w+")
+    argv.pop(idx)
+    argv.pop(idx)
+else:
+    conf["oFile"] = sys.stdout
+
+tIdx = argv.index("-t")
+conf["tFile"] = open(argv[tIdx+1], "r")
+argv.pop(tIdx)
+argv.pop(tIdx)
+
+conf["iFile"] = open(argv[1])
+
+for i in sorted(conf.keys()):
+    print("{}: {}".format(i, conf[i]))
