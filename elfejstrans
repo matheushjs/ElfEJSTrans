@@ -23,28 +23,33 @@ conf = {
     "tFile": None,
 }
 
-if argv.count("-h") > 0:
-    print(conf["helpMsg"])
-    sys.exit(0)
+def configure():
+    if argv.count("-h") > 0:
+        print(conf["helpMsg"])
+        sys.exit(0)
 
-if argv.count("-t") == 0:
-    print(conf["helpMsg"])
-    sys.exit(1)
+    if argv.count("-t") == 0:
+        print(conf["helpMsg"])
+        sys.exit(1)
 
-if argv.count("-o") > 0:
-    idx = argv.index("-o")
-    conf["oFile"] = open(argv[idx+1], "w+")
-    argv.pop(idx)
-    argv.pop(idx)
-else:
-    conf["oFile"] = sys.stdout
+    if argv.count("-o") > 0:
+        idx = argv.index("-o")
+        conf["oFile"] = open(argv[idx+1], "w+")
+        argv.pop(idx)
+        argv.pop(idx)
+    else:
+        conf["oFile"] = sys.stdout
 
-tIdx = argv.index("-t")
-conf["tFile"] = open(argv[tIdx+1], "r")
-argv.pop(tIdx)
-argv.pop(tIdx)
+    tIdx = argv.index("-t")
+    conf["tFile"] = open(argv[tIdx+1], "r")
+    argv.pop(tIdx)
+    argv.pop(tIdx)
 
-conf["iFile"] = open(argv[1])
+    conf["iFile"] = open(argv[1])
 
-for i in sorted(conf.keys()):
-    print("{}: {}".format(i, conf[i]))
+
+if __name__ == "__main__":
+    configure()
+
+    for i in sorted(conf.keys()):
+        print("{}: {}".format(i, conf[i]))
