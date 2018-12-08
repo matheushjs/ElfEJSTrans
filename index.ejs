@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+
+<% if(lang === "ja") { %>
+  <html lang="ja">
+<% } else { %>
+  <html lang="en">
+<% } %>
+
+  <head>
+    <% include ../partials/head_common %>
+  </head>
+
+  <body id="elfPage" data-spy="scroll" data-target="#floatingIndex" data-offset="60">
+    <div class="jumbotron elf-starry-sky">
+      <div>
+        <% include ../partials/navbar %>
+      </div>
+      <div class="text-center container" style="margin: 10vh auto;">
+        <%= TRANSLATION.home.majorTitle %>
+      </div>
+    </div>
+
+    <div>
+      <% include ../partials/footer %>
+    </div>
+  </body>
+</html>
