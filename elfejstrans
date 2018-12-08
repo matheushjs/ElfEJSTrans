@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import sys
+import yaml
 from sys import argv
 
 conf = {
@@ -21,6 +22,8 @@ conf = {
     "oFile": None,
     "iFile": None,
     "tFile": None,
+
+    "tObj": "TRANS",
 }
 
 def configure():
@@ -47,9 +50,78 @@ def configure():
 
     conf["iFile"] = open(argv[1])
 
+def translate():
+    # Read translation file
+    transDict = yaml.load(conf["tFile"])
+    print(transDict)
+
+    # Read EJS file
+    lines = conf["iFile"].read().split("\n")
+
+    output = []
+
+    # Process each line, looking for <%= %> markers
+    for line in lines:
+        # Skip lines without <%= %>
+        if line.find("<%=") < 0:
+            output.append(line)
+            continue
+
+        # Skip lines without the TRANS object
+        if line.find(conf["tObj"] + ".") < 0:
+            output.append(line)
+            continue
+
+        # We have a line
+        #   <%= TRANS.home.majorTitle %>
+        # and we want it to become
+        #   <% if(lang == "en") %>
+        #     Welcome
+        #   <% else if(lang == "pt") %>
+        #     Bem vindo
+        #
+        # In the line with <%= %> we have to:
+        # 1. identify where all the <%= %> blocks are
+        # 2. confirm there is a TRANS object within these blocks
+        # 3. erase the blocks with TRANS objects, replacing the TRANS object with its due translation
+
+        # First we confirm equal amount of opening/closing markers
+        if line.count("<%=") != line.count("%>"):
+            sys.stdout.write("Found wrongly opened/closed <%= %> block. Terminating.\n")
+            sys.exit(2)
+
+        print(line)
+
+        # 1. identify blocks
+        splitt = line.split("<%=")
+        line = ""
+        for s in splitt:
+            listt = s.split("%>")  # Split again, now using the end of a block
+            if len(listt) == 1:    # Length is 1 if it doesn't have a block <%= %>
+                line += listt[0]
+            elif len(listt) == 2:  # Length is 2 if it has a block
+                block = listt[0]
+                tail  = listt[1]
+
+                if block.find(conf["tObj"]) >= 0:
+                    # Replace the TRANS object for a "{}" (formatter string token)
+                    # And add the replacement dictionary for it in a list
+                    pass
+                else:
+                    # There is no TRANS object, so we add the block back to the line
+                    line += "<%=" + block + "%>"
+
+                line += tail
+            else:
+                sys.stdout.write("Something went really wrong. Terminating.\n")
+                sys.exit(3)
+
+        print(line)
 
 if __name__ == "__main__":
     configure()
 
     for i in sorted(conf.keys()):
         print("{}: {}".format(i, conf[i]))
+
+    translate()
